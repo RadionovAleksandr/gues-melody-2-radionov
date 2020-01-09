@@ -1,17 +1,35 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from "react-redux";
+
 import Welcome from '../welcome-screen/welcome-screen.jsx';
 import GameArtist from '../game-artist/game-artist.jsx';
 import GameGenre from '../game-genre/game-genre.jsx';
+import { ActionCreators } from '../../reducer';
+
+import withActivePlayer  from '../../hocs/with-active-player/with-active-player';
+import  withUserAnswer  from '../../hocs/with-user-answer/with-user-answer';
+import { withTransformProps } from '../../hocs/with-transform-props/with-transform-props';
+
+// const transformPlayerToAnswer = (props) => {
+//     const newProps = object.assign({}, props, {
+//         renderAnswer: props.renderPlayer
+//     });
+//     delete newProps.renderPlayer;
+//     return newProps;
+// };
+
+// const GameGenreWrapped = withUserAnswer(withActivePlayer(withTransformProps((props) => {
+//     return Object.assign({}, props, {
+//         renderAnswer: props.renderPlayer
+//     })
+// })(GameGenre)))
+
+const GameGenreWrapped = withUserAnswer(withActivePlayer((GameGenre)))
 
 class App extends PureComponent {
     constructor(props) {
         super(props);
-
-
-        this.state = {
-            question: -1,
-        };
     };
 
     _getScreen(question, onUserAnswer) {
@@ -35,7 +53,7 @@ class App extends PureComponent {
         //  const currentQuestion = questions[question];
 
         switch (question.type) {
-            case `genre`: return <GameGenre
+            case `genre`: return <GameGenreWrapped
                 gameTime={gameTime}
                 question={question}
                 onAnswer={onUserAnswer}
@@ -57,7 +75,7 @@ class App extends PureComponent {
         // console.log(`this.props.settings`)
         // console.log(this.props.settings.gameTime)
 
-        
+
         const {
             gameTime,
             errorCount,
@@ -66,7 +84,7 @@ class App extends PureComponent {
         // const gameTime = this.props.settings.gameTime;
         // const errorCount = this.props.settings.errorCount;
 
-        const {question} = this.state //.props.settings.questions //.questions[this.state.currentLevel];
+        const { question } = this.state //.props.settings.questions //.questions[this.state.currentLevel];
         const questions = this.props.questions
         // console.log(`this.props`)
         // console.log(this.props)
@@ -92,35 +110,18 @@ class App extends PureComponent {
                 </div>
 
                 <div className="game__mistakes">
-                    <div className="wrong" />
-                    <div className="wrong" />
-                    <div className="wrong" />
+                    {new Array(this.state.mistakes).map((it, i) => {
+                        <div className="wrong" />
+                    })}
                 </div>
             </header>
 
-            {this._getScreen(questions[question], () => {
-                this.setState({
-                    question: question + 1 >= questions.length
-                        ? 0
-                        : question + 1
-                });
-            })}
+            {this._getScreen(questions[step], (userAnswer) => {
+                this.props.onUserAnswer(questions[step].type, userAnswer);
+            }
+            )}
 
         </section>
-
-        // return App.getScreen(this.state, () => {
-        // this.setState((prevState) => {
-        //     console.log(`prevState`);
-        //     console.log(prevState)
-        //     const nextIndex = prevState.currentLevel + 1;
-        //     const isEnd = nextIndex >= this.state.questions.length;
-
-        //     return {
-        //         ...prevState,
-        //         currentLevel: !isEnd ? nextIndex : -1,
-        //     };
-        // });
-        // });
     }
 }
 
@@ -130,41 +131,29 @@ App.propTypes = {
     //     errorCount: PropTypes.number.isRequired,
     //     currentLevel: PropTypes.number.isRequired,
     //   }).isRequired,
+    // step: PropTypes.number.isRequired,
+    // mistakes: PropTypes.number.isRequired,
     //   questions: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
-export default App;
+console.log(' ownProps ')
+console.log( ownProps )
 
+const mapStateToProps = (state, ownProps) => object.assign({}, ownProps, {
+    step: state.step,
+    mistakes: state.mistakes
+});
 
-//        // return <section className="game game--artist">
-//         //     <header className="game__header">
-//         //         <a className="game__back" href="#" onClick={this._handleClick}>
-//         //             <span className="visually-hidden">Сыграть ещё раз</span>
-//         //             <img className="game__logo" src="img/melody-logo-ginger.png" alt="Угадай мелодию" />
-//         //         </a>
+const mapDispatchToProps = (dispatch) => ({
+    onUserAnswer: (question, userAnswer, mistakes, maxMistakes) => {
+        dispatch(ActionCreators.incrementStep());
+        dispatch(ActionCreators.incrementMistakes(userAnswer, question, mistakes, maxMistakes));
+    }
+});
 
-//         //         <svg xmlns="http://www.w3.org/2000/svg" className="timer" viewBox="0 0 780 780">
-//         //             <circle className="timer__line" cx="390" cy="390" r="370" style="filter: url(#blur); transform: rotate(-90deg) scaleY(-1); transform-origin: center" />
-//         //         </svg>
+export { App };
 
-//         //         <div className="timer__value" xmlns="http://www.w3.org/1999/xhtml">
-//         //             <span className="timer__mins">05</span>
-//         //             <span className="timer__dots">:</span>
-//         //             <span className="timer__secs">00</span>
-//         //         </div>
-
-//         //         <div className="game__mistakes">
-//         //             <div className="wrong"></div>
-//         //             <div className="wrong"></div>
-//         //             <div className="wrong"></div>
-//         //         </div>
-//         //     </header>
-
-//         //     {this._getScreen(questions[question], () => {
-//         //         this.setState({
-//         //             question: question + 1 >= question.length
-//         //                 ? 0
-//         //                 : question + 1,
-//         //         });
-//         //     })}
-//         // </section >
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(App);
