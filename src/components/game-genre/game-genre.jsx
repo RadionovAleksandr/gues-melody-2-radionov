@@ -2,69 +2,67 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import AudioPlayer from '../audio-player/audio-player.jsx';
 
-console.log(`Screen GameGenre`)
-
 class GameGenre extends React.PureComponent {
 
+    constructor(props) {
+        super(props);
+
+
+        this.state = {
+            activePlayer: -1
+        };
+    }
+
     render() {
-        console.log(`props GameGenre`);
-        console.log(this.props);
+        const { question, onAnswer } = this.props;
+        const { answers, genre } = question;
 
-        // console.log(`answers`);
-        // console.log(answers);
+        return <section className="game game--genre">
 
-        const { genre, answers } = this.props.question;
-        const { question, onAnswer, onChange, renderAnswer, userAnswer } = this.props;
+            <section className="game__screen">
+                <h2 className="game__title">Выберите {question.answers.genre} треки</h2>
+                <form className="game__tracks" onSubmit={(evt) => {
+                    evt.preventDefault();
+                    onAnswer();
+                }}>
 
-        return <section className="game__screen">
+                    {answers.map((it, i) => (
+                        <div key={`answer-${i}`} className="track">
+                            <AudioPlayer
+                                sec={it.src}
+                                isPlaing={i === this.state.activePlayer}
+                                onPlayButtonClick={() => {
+                                    this.setState({
+                                        activePlayer: this.state.activePlayer === i ? -1 : i
+                                    })
+                                }}
+                            />
+                        </div>
+                    ))}
 
-            <h2 className="game__title">Выберите {genre} треки</h2>
-            <form className="game__tracks" onSubmit={(evt) => {
-                evt.preventDefault();
-                onAnswer();
-            }}>
-                {answers.map((it, i) => <div key={`answer-${i}`} className="track">
-                    {renderAnswer(it, i)}
-                    <div className="game__answer">
-                        <input
-                            checked={userAnswer[i]}
-                            className="game__input visually-hidden"
-                            type="checkbox"
-                            name="answer"
-                            value={`answer-${i}`}
-                            id={`answer-${i}`}
-                            onChange={() => { onChange(i) }}
-                        />
-                        <label className="game__check"
-                            htmlFor={`answer-${i}`}>Отметить</label>
-                    </div>
-                </div>)}
-                <button className="game__submit button" type="submit">Ответить</button>
-            </form>
+                    <button className="game__submit button" type="submit">Ответить
+            </button>
+                </form>
+            </section>
         </section>
+    }
 
-    };
+} ({ question, onAnswer }) => {
+    const answers = question.answers;
 };
 
-// GameGenre.propTypes = {
-//     question: PropTypes.exact({
-//         type: PropTypes.oneOf([`genre`, `artist`]),
-//         genre: PropTypes.string,
-//         answers: PropTypes.arrayOf(
-//             PropTypes.exact({
-//                 src: PropTypes.string,
-//                 genre: PropTypes.string,
-//             })
-//         ),
-//     }).isRequired,
-//     onAnswer: PropTypes.func.isRequired,
-// };
+GameGenre.propTypes = {
+    question: PropTypes.exact({
+        type: PropTypes.oneOf([`genre`, `artist`]),
+        genre: PropTypes.string,
+        answers: PropTypes.arrayOf(
+            PropTypes.exact({
+                src: PropTypes.string,
+                genre: PropTypes.string,
+            })
+        ),
+    }).isRequired,
+    onAnswer: PropTypes.func.isRequired,
+};
 
 export default GameGenre;
-
-
-const onClick = (action) => {
-    action.preventDefault;
-    action.preventDefault;
-
-}
