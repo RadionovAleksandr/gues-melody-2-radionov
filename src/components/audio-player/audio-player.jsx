@@ -18,9 +18,9 @@ class AudioPlayer extends React.PureComponent {
 
 
     render() {
-        console.log(` AudioPlayer state`)
-        console.log(this.state)
-        console.log(this.props)
+        // console.log(` AudioPlayer state`);
+        // console.log(this.state);
+        // console.log(this.props);
         // const { isloading } = this.state.isloading;
         const { isPlaying } = this.state.isPlaying;
 

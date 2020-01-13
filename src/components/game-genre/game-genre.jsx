@@ -9,13 +9,18 @@ class GameGenre extends React.PureComponent {
 
 
         this.state = {
-            activePlayer: -1
+            activePlayer: -1,
+            userAnswer: new Array(this.props.question.answers.length).fill(false),
         };
     }
 
     render() {
+ 
         const { question, onAnswer } = this.props;
         const { answers, genre } = question;
+
+        console.log('onAnswer');
+        console.log(onAnswer);
 
         return <section className="game game--genre">
 
@@ -23,7 +28,7 @@ class GameGenre extends React.PureComponent {
                 <h2 className="game__title">Выберите {question.answers.genre} треки</h2>
                 <form className="game__tracks" onSubmit={(evt) => {
                     evt.preventDefault();
-                    onAnswer();
+                    onAnswer(this.state.userAnswer);
                 }}>
 
                     {answers.map((it, i) => (
@@ -37,7 +42,28 @@ class GameGenre extends React.PureComponent {
                                     })
                                 }}
                             />
+                            <div className="game__answer">
+                                <input
+                                    className="game__input visually-hidden"
+                                    type="checkbox"
+                                    name="answer"
+                                    value={`answer-${i}`}
+                                    id={`answer-${i}`}
+                                    onChange={() => {
+                                        const userAnswer = this.state.userAnswer.slice(0);
+                                        userAnswer[i] = !userAnswer[i];
+                                        
+                                        this.setState({
+                                            userAnswer,
+                                        })
+                                    }}
+                                />
+                                <label className="game__check" htmlFor={`answer-${i}`}>
+                                    Отметить
+                                </label>
+                            </div>
                         </div>
+
                     ))}
 
                     <button className="game__submit button" type="submit">Ответить
@@ -46,10 +72,7 @@ class GameGenre extends React.PureComponent {
             </section>
         </section>
     }
-
-} ({ question, onAnswer }) => {
-    const answers = question.answers;
-};
+}
 
 GameGenre.propTypes = {
     question: PropTypes.exact({
