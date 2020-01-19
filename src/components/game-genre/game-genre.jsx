@@ -2,61 +2,77 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import AudioPlayer from '../audio-player/audio-player.jsx';
 
-console.log(`Screen GameGenre`)
-
 class GameGenre extends React.PureComponent {
 
     constructor(props) {
         super(props);
 
+
         this.state = {
-            activePlayer: -1
-        }
-    };
-
-
+            activePlayer: -1,
+            userAnswer: new Array(this.props.question.answers.length).fill(false),
+        };
+    }
 
     render() {
-        console.log(`props GameGenre`);
-        console.log(this.props);
+ 
+        const { question, onAnswer } = this.props;
+        const { answers, genre } = question;
 
-        // console.log(`answers`);
-        // console.log(answers);
-        const genre = this.props.question.genre;
-        const answers = this.props.question.answers;
+        console.log('onAnswer');
+        console.log(onAnswer);
 
-        return <section className="game__screen">
+        return <section className="game game--genre">
 
-            <h2 className="game__title">Выберите {genre} треки</h2>
-            <form className="game__tracks" onSubmit={(evt) => {
-                evt.preventDefault();
-                props.onAnswer();
-            }}>
+            <section className="game__screen">
+                <h2 className="game__title">Выберите {question.answers.genre} треки</h2>
+                <form className="game__tracks" onSubmit={(evt) => {
+                    evt.preventDefault();
+                    onAnswer(this.state.userAnswer);
+                }}>
 
-                {answers.map((it, i) => <div key={`answer-${i}`} className="track">
-                    <AudioPlayer
-                        src={it.src}
-                        isPlaying = {i === this.state.activePlayer}
-                        onPlayButtonClick={() => this.setState({
-                            activePlayer: this.state.activePlayer === i ? -1 : i
-                        })}
-                    />
+                    {answers.map((it, i) => (
+                        <div key={`answer-${i}`} className="track">
+                            <AudioPlayer
+                                sec={it.src}
+                                isPlaing={i === this.state.activePlayer}
+                                onPlayButtonClick={() => {
+                                    this.setState({
+                                        activePlayer: this.state.activePlayer === i ? -1 : i
+                                    })
+                                }}
+                            />
+                            <div className="game__answer">
+                                <input
+                                    className="game__input visually-hidden"
+                                    type="checkbox"
+                                    name="answer"
+                                    value={`answer-${i}`}
+                                    id={`answer-${i}`}
+                                    onChange={() => {
+                                        const userAnswer = this.state.userAnswer.slice(0);
+                                        userAnswer[i] = !userAnswer[i];
+                                        
+                                        this.setState({
+                                            userAnswer,
+                                        })
+                                    }}
+                                />
+                                <label className="game__check" htmlFor={`answer-${i}`}>
+                                    Отметить
+                                </label>
+                            </div>
+                        </div>
 
-                    <div className="game__answer">
-                        <input className="game__input visually-hidden" type="checkbox"
-                            name="answer" value={`answer-${i}`} id={`answer-${i}`} />
-                        <label className="game__check"
-                            htmlFor={`answer-${i}`}>Отметить</label>
-                    </div>
-                </div>
-                )}
+                    ))}
 
-                <button className="game__submit button" type="submit">Ответить</button>
-            </form>
+                    <button className="game__submit button" type="submit">Ответить
+            </button>
+                </form>
+            </section>
         </section>
-
-    };
-};
+    }
+}
 
 GameGenre.propTypes = {
     question: PropTypes.exact({

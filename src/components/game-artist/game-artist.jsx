@@ -2,58 +2,33 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import AudioPlayer from '../audio-player/audio-player.jsx';
 
-class GameArtist extends React.PureComponent {
-    
-    constructor(props) {
-        super(props);
-        this.state = {
-            isPlaying: false
-        };
-    }
+const GameArtist = ({ question, onAnswer }) => {
+    const song = question.song;
+    const answers = question.answers;
 
+    return (
+        <section className="game__screen">
+            <h2 className="game__title">Кто исполняет эту песню?</h2>
 
-    render () {
-        // const song = question.song;
-        // const answers = question.answers;
-        const {
-            answers,
-            song
-        } = question;
+            <div className="game__track">
+                <AudioPlayer src={song.src} />
+            </div>
 
-        <section className="game game--artist">
-
-            <section className="game__screen">
-                <h2 className="game__title">Кто исполняет эту песню?</h2>
-                <div className="game__track">
-                    <div className="track">
-                        <AudioPlayer
-                            src={it.src}
-                            isPlaying={isPlaying}
-                            onPlayButtonClick={() => this.setState({
-                                isPlaying: !isPlaying
-                            })}
-                        />
+            <form className="game__artist" onChange={onAnswer}>
+                {answers.map((answer, i) => (
+                    <div className="artist" key={`answer-${i}`}>
+                        <input className="artist__input visually-hidden" type="radio"
+                            name="answer" value={`artist-${i}`} id={`artist-${i}`} />
+                        <label className="artist__name" htmlFor={`artist-${i}`}>
+                            <img className="artist__picture"
+                                src={answer.picture} alt={answer.artist} />
+                            {answer.artist}
+                        </label>
                     </div>
-                </div>
-
-                <form className="game__artist" onChange={onAnswer}>
-
-                    {answers.map((answer, i) => (
-                        <div className="artist" key={`answer-${i}`}>
-                            <input className="artist__input visually-hidden" type="radio"
-                                name="answer" value={`artist-${i}`} id={`artist-${i}`} />
-                            <label className="artist__name" htmlFor={`artist-${i}`}>
-                                <img className="artist__picture"
-                                    src={answer.picture} alt={answer.artist} />
-                                {answer.artist}
-                            </label>
-                        </div>
-                    ))}
-
-                </form>
-            </section>
+                ))}
+            </form>
         </section>
-    };
+    );
 };
 
 GameArtist.propTypes = {
