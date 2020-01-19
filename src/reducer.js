@@ -4,7 +4,6 @@ const initialState = {
 };
 
 const ActionCreators = {
-
     "increment_step": (question, userAnswer) => {
         let isAnswerCorrect = false;
         console.log(`question`)
