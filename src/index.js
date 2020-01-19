@@ -1,25 +1,33 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
 import App from './components/app/app.jsx';
+// import settings from '../mocks/game-settings';
 import questions from './mocks/questions';
 
-const settings = {
-    gameTime: 5,
-    errorCount: 3,
-    // currentLevel: -1,  
-};
+import { createStore } from "redux";
+import { Provider } from "react-redux";
+import { reducer } from "./reducer";
 
+const store = createStore(reducer);
 
-// console.log('Страница Index');
-// console.log(questions);
-const init = () => {
-  ReactDOM.render(
-      <App
-        settings={settings}
-        questions={questions}
-      />,
-      document.querySelector(`.main`)
+const gameSettings = {
+  gameTime: 5,
+  errorCount: 3,
+}
+
+const init = (gameQuestions) => {
+  // const {
+  //   gameTime,
+  //   errorCount
+  // } = gameSettings
+
+  ReactDOM.render(<Provider store={store}>
+    <App settings={gameSettings}
+      questions={gameQuestions}
+    />
+  </Provider>,
+    document.querySelector(`.main`)
   );
 };
 
-init();
+init(questions);
